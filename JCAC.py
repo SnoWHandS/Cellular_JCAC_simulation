@@ -8,7 +8,7 @@ import math
 #This is the main function which takes in a network configuration and call rate value and determines the dropping and blocking probabilities
 #t1,t2 = Maximum number of new calls for each RAT
 #c1,c2 = Maximum number of handoff calls for each RAT
-def calc_probs(t1,t2,c1,c2,bbu,callRate):
+def calc_probs(t1,t2,c1,c2,bbu,callRate,departRate):
     #Create and instantiate call variables
     n1 = 0  #New calls for RAT1
     n2 = 0  #New calls for RAT2
@@ -33,8 +33,8 @@ def calc_probs(t1,t2,c1,c2,bbu,callRate):
     #Split call rate into new calls and handover calls
     new_split = 0.4                         #40% new
     handovr_split = 1-new_split             #60% handover
-    new_calls = callRate*new_split
-    handovr_calls = callRate*handovr_split
+    new_calls = (callRate/departRate)*new_split
+    handovr_calls = (callRate/departRate)*handovr_split
 
     #New calls incremented until reached threshhold for RAT1
     for n1 in range(0,t1):       #might need to be t1+1
@@ -91,19 +91,37 @@ def calc_probs(t1,t2,c1,c2,bbu,callRate):
 
 
 def test_call_arrival_rate():
-    #create heterogeneous network and calculate probabilities for increasing call rates
+    #create heterogeneous network and calculate probabilities for increasing call (arrival) rates
     c1 = c2 = 20
     t1 = t2 = 10
     bbu = 1
     maxCalls = 35
+    depart = 1
     file = open("./Output/CallArrivalprobabilites.csv", "w")
     file.write("Call Arrival Rate, Group 1 Calls Blocked,Group 2 Calls Blocked,Group 1 Calls Dropped,Group 2 Calls Dropped\n")
 
     for calls in range(1,maxCalls):
         #calculate the probabilities
-        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t1,t2,c1,c2,bbu,calls)
+        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t1,t2,c1,c2,bbu,calls,depart)
         #write to csv file
         file.write(str(calls) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
+
+def test_call_departure_rate():
+    #create heterogeneous network and calculate probabilities for increasing call (depart) rates
+    c1 = c2 = 20
+    t1 = t2 = 15
+    bbu = 1
+    callArrivalRate = 10
+    maxDepart = 20
+    file = open("./Output/CallDepartprobabilites.csv", "w")
+    file.write("Call Departure Rate, Group 1 Calls Blocked,Group 2 Calls Blocked,Group 1 Calls Dropped,Group 2 Calls Dropped\n")
+
+    for depart in range(1,maxDepart):
+        #calculate the probabilities
+        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t1,t2,c1,c2,bbu,callArrivalRate,depart)
+        #write to csv file
+        file.write(str(depart) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
+
 
 def test_increasing_capacity():
     #same as call arrival rate test but with capacity changing
@@ -111,30 +129,35 @@ def test_increasing_capacity():
     t1 = t2 = 10
     bbu = 1
     callArrivalRate = 10    #locked this to 10 calls
+    depart = 1
     file = open("./Output/Capacityprobabilites.csv", "w")
     file.write("Capacity, Group 1 Calls Blocked,Group 2 Calls Blocked,Group 1 Calls Dropped,Group 2 Calls Dropped\n")
 
     for c in range(1,maxCapacity):
         #calculate the probabilities
-        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t1,t2,c,c,bbu,callArrivalRate)
+        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t1,t2,c,c,bbu,callArrivalRate,depart)
         #write to csv file
         file.write(str(c) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
 
 def test_increasing_threshold():
-    #same as call arrival rate test but with capacity changing
+    #same as call arrival rate test but with threshold changing
     c1 = c2 = 20
     maxThreshold = c1       #set the threshold as sa % of the maximum capacity
     bbu = 1
     callArrivalRate = 20    #locked this to 20 calls
+    depart = 1
     file = open("./Output/Thresholdprobabilites.csv", "w")
     file.write("Threshold, % of Capacity , Group 1 Calls Blocked,Group 2 Calls Blocked,Group 1 Calls Dropped,Group 2 Calls Dropped\n")
 
     for t in range(1,maxThreshold+1):
         #calculate the probabilities
-        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t,t,c1,c2,bbu,callArrivalRate)
+        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t,t,c1,c2,bbu,callArrivalRate,depart)
         #write to csv file
         file.write(str(t) + "," + str((t/c1)*100) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
 
-#test_call_arrival_rate()
-#test_increasing_capacity()
+
+#Execute all the tests
+test_call_arrival_rate()
+test_increasing_capacity()
 test_increasing_threshold()
+test_call_departure_rate()

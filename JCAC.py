@@ -120,5 +120,21 @@ def test_increasing_capacity():
         #write to csv file
         file.write(str(c) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
 
+def test_increasing_threshold():
+    #same as call arrival rate test but with capacity changing
+    c1 = c2 = 20
+    maxThreshold = c1       #set the threshold as sa % of the maximum capacity
+    bbu = 1
+    callArrivalRate = 20    #locked this to 20 calls
+    file = open("./Output/Thresholdprobabilites.csv", "w")
+    file.write("Threshold, % of Capacity , Group 1 Calls Blocked,Group 2 Calls Blocked,Group 1 Calls Dropped,Group 2 Calls Dropped\n")
+
+    for t in range(1,maxThreshold+1):
+        #calculate the probabilities
+        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t,t,c1,c2,bbu,callArrivalRate)
+        #write to csv file
+        file.write(str(t) + "," + str((t/c1)*100) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
+
 #test_call_arrival_rate()
-test_increasing_capacity()
+#test_increasing_capacity()
+test_increasing_threshold()

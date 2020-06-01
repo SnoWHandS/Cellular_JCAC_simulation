@@ -6,8 +6,6 @@
 import math
 
 #This is the main function which takes in a network configuration and call rate value and determines the dropping and blocking probabilities
-#t1,t2 = Maximum number of new calls for each RAT
-#c1,c2 = Maximum number of handoff calls for each RAT
 def calc_probs(t1,t2,c1,c2,bbu,callRate,departRate):
     #Create and instantiate call variables
     n1 = 0  #New calls for RAT1
@@ -155,9 +153,27 @@ def test_increasing_threshold():
         #write to csv file
         file.write(str(t) + "," + str((t/c1)*100) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
 
+def test_increasing_baseBandwidth():
+    #same as call arrival rate test but with threshold changing
+    c1 = c2 = 20
+    t1 = t2 = 10       
+    maxBbu = 15                 #set max bandwidth
+    callArrivalRate = 10    #locked this to 10 calls
+    depart = 1
+    file = open("./Output/BBUprobabilites.csv", "w")
+    file.write("Base Bandwidth Unit (bbu) , Group 1 Calls Blocked,Group 2 Calls Blocked,Group 1 Calls Dropped,Group 2 Calls Dropped\n")
+
+    for bbu in range(1,maxBbu+1):
+        #calculate the probabilities
+        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t1,t2,c1,c2,bbu,callArrivalRate,depart)
+        #write to csv file
+        file.write(str(bbu) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
+
+
 
 #Execute all the tests
 test_call_arrival_rate()
 test_increasing_capacity()
 test_increasing_threshold()
 test_call_departure_rate()
+test_increasing_baseBandwidth()

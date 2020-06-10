@@ -106,11 +106,11 @@ def test_call_arrival_rate():
 
 def test_call_departure_rate():
     #create heterogeneous network and calculate probabilities for increasing call (depart) rates
-    c1 = c2 = 20
-    t1 = t2 = 15
+    c1 = c2 = 15
+    t1 = t2 = 10
     bbu = 1
-    callArrivalRate = 10
-    maxDepart = 20
+    callArrivalRate = 35
+    maxDepart = 15
     file = open("./Output/CallDepartprobabilites.csv", "w")
     file.write("Call Departure Rate, Group 1 Calls Blocked,Group 2 Calls Blocked,Group 1 Calls Dropped,Group 2 Calls Dropped\n")
 
@@ -142,7 +142,7 @@ def test_increasing_threshold():
     c1 = c2 = 20
     maxThreshold = c1       #set the threshold as sa % of the maximum capacity
     bbu = 1
-    callArrivalRate = 20    #locked this to 20 calls
+    callArrivalRate = 10    #locked this to 10 calls - made most interesting calls blocked curve
     depart = 1
     file = open("./Output/Thresholdprobabilites.csv", "w")
     file.write("Threshold, % of Capacity , Group 1 Calls Blocked,Group 2 Calls Blocked,Group 1 Calls Dropped,Group 2 Calls Dropped\n")
@@ -151,13 +151,13 @@ def test_increasing_threshold():
         #calculate the probabilities
         (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t,t,c1,c2,bbu,callArrivalRate,depart)
         #write to csv file
-        file.write(str(t) + "," + str((t/c1)*100) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
+        file.write(str(t) + "," + str((float(t)/float(c1))*100) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
 
 def test_increasing_baseBandwidth():
     #same as call arrival rate test but with threshold changing
     c1 = c2 = 20
     t1 = t2 = 10       
-    maxBbu = 15                 #set max bandwidth
+    maxBbu = 80                 #set max bandwidth
     callArrivalRate = 10    #locked this to 10 calls
     depart = 1
     file = open("./Output/BBUprobabilites.csv", "w")
@@ -165,9 +165,10 @@ def test_increasing_baseBandwidth():
 
     for bbu in range(1,maxBbu+1):
         #calculate the probabilities
-        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t1,t2,c1,c2,bbu,callArrivalRate,depart)
+        halfbbu=float(bbu)/5
+        (probBlock1, probBlock2, probDrop1, probDrop2) = calc_probs(t1,t2,c1,c2,halfbbu,callArrivalRate,depart)
         #write to csv file
-        file.write(str(bbu) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
+        file.write(str(halfbbu) + "," + str(probBlock1) + "," + str(probBlock2) + "," + str(probDrop1) + "," + str(probDrop2) + "\n")
 
 
 
